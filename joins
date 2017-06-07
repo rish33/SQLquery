@@ -1,0 +1,231 @@
+mysql> use db;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> create table account(a_id int, type char(20));
+Query OK, 0 rows affected (0.31 sec)
+
+mysql> alter table account(f_name char(20));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '(f_name char(20))' at line 1
+mysql> alter table account add (f_name char(20));
+Query OK, 0 rows affected (0.50 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> desc table employee;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'table employee' at line 1
+mysql> desc employee;
++--------+----------+------+-----+---------+-------+
+| Field  | Type     | Null | Key | Default | Extra |
++--------+----------+------+-----+---------+-------+
+| f_name | char(20) | YES  |     | NULL    |       |
+| l_name | char(20) | YES  |     | NULL    |       |
+| desgn  | char(20) | YES  |     | NULL    |       |
+| emp_id | int(11)  | YES  |     | NULL    |       |
+| salary | int(11)  | YES  |     | NULL    |       |
++--------+----------+------+-----+---------+-------+
+5 rows in set (0.00 sec)
+
+mysql> desc account
+    -> desc account;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'desc account' at line 2
+mysql> insert into account values ("1","savings","rakesh");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> select * from employee;
++--------+--------+---------+--------+--------+
+| f_name | l_name | desgn   | emp_id | salary |
++--------+--------+---------+--------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |
+| rohit  | saxena | CTO     |      3 |  40000 |
+| chetan | singh  | Manager |      2 |  60000 |
+| chetu  | singh  | Damager |      4 |  10000 |
++--------+--------+---------+--------+--------+
+4 rows in set (0.00 sec)
+
+mysql> insert into account values ("2","savings","chetan");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into account values ("4","joint","rohit");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> insert into account values ("3","joint","chetu");
+Query OK, 1 row affected (0.04 sec)
+
+mysql> select * from account;
++------+---------+--------+
+| a_id | type    | f_name |
++------+---------+--------+
+|    1 | savings | rakesh |
+|    2 | savings | chetan |
+|    4 | joint   | rohit  |
+|    3 | joint   | chetu  |
++------+---------+--------+
+4 rows in set (0.00 sec)
+
+mysql> select * from emplyee join account on employee.f_name=account.f_name;
+ERROR 1146 (42S02): Table 'db.emplyee' doesn't exist
+mysql> select * from employee join account on employee.f_name=account.f_name;
++--------+--------+---------+--------+--------+------+---------+--------+
+| f_name | l_name | desgn   | emp_id | salary | a_id | type    | f_name |
++--------+--------+---------+--------+--------+------+---------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |    1 | savings | rakesh |
+| chetan | singh  | Manager |      2 |  60000 |    2 | savings | chetan |
+| rohit  | saxena | CTO     |      3 |  40000 |    4 | joint   | rohit  |
+| chetu  | singh  | Damager |      4 |  10000 |    3 | joint   | chetu  |
++--------+--------+---------+--------+--------+------+---------+--------+
+4 rows in set (0.00 sec)
+
+mysql> select * from employee left outer join account on employee.f_name=account.f_name;
++--------+--------+---------+--------+--------+------+---------+--------+
+| f_name | l_name | desgn   | emp_id | salary | a_id | type    | f_name |
++--------+--------+---------+--------+--------+------+---------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |    1 | savings | rakesh |
+| chetan | singh  | Manager |      2 |  60000 |    2 | savings | chetan |
+| rohit  | saxena | CTO     |      3 |  40000 |    4 | joint   | rohit  |
+| chetu  | singh  | Damager |      4 |  10000 |    3 | joint   | chetu  |
++--------+--------+---------+--------+--------+------+---------+--------+
+4 rows in set (0.00 sec)
+
+mysql> select * from employee left outer join account on employee.f_name=account.f_name where employee.l_name="singh";
++--------+--------+---------+--------+--------+------+---------+--------+
+| f_name | l_name | desgn   | emp_id | salary | a_id | type    | f_name |
++--------+--------+---------+--------+--------+------+---------+--------+
+| chetan | singh  | Manager |      2 |  60000 |    2 | savings | chetan |
+| chetu  | singh  | Damager |      4 |  10000 |    3 | joint   | chetu  |
++--------+--------+---------+--------+--------+------+---------+--------+
+2 rows in set (0.00 sec)
+
+mysql> select * from employee right outer join account on employee.f_name=account.f_name where employee.l_name="singh";
++--------+--------+---------+--------+--------+------+---------+--------+
+| f_name | l_name | desgn   | emp_id | salary | a_id | type    | f_name |
++--------+--------+---------+--------+--------+------+---------+--------+
+| chetan | singh  | Manager |      2 |  60000 |    2 | savings | chetan |
+| chetu  | singh  | Damager |      4 |  10000 |    3 | joint   | chetu  |
++--------+--------+---------+--------+--------+------+---------+--------+
+2 rows in set (0.00 sec)
+
+mysql> insert into student values("6","joint","mohit");
+ERROR 1146 (42S02): Table 'db.student' doesn't exist
+mysql> insert into account values("6","joint","mohit");
+Query OK, 1 row affected (0.05 sec)
+
+mysql> select * from account;
++------+---------+--------+
+| a_id | type    | f_name |
++------+---------+--------+
+|    1 | savings | rakesh |
+|    2 | savings | chetan |
+|    4 | joint   | rohit  |
+|    3 | joint   | chetu  |
+|    6 | joint   | mohit  |
++------+---------+--------+
+5 rows in set (0.00 sec)
+
+mysql> insert into employee values ("dev","lal","clerk",6);
+ERROR 1136 (21S01): Column count doesn't match value count at row 1
+mysql> insert into employee values ("dev","lal","clerk",6,"25000");
+Query OK, 1 row affected (0.05 sec)
+
+mysql> select * from employee;
++--------+--------+---------+--------+--------+
+| f_name | l_name | desgn   | emp_id | salary |
++--------+--------+---------+--------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |
+| rohit  | saxena | CTO     |      3 |  40000 |
+| chetan | singh  | Manager |      2 |  60000 |
+| chetu  | singh  | Damager |      4 |  10000 |
+| dev    | lal    | clerk   |      6 |  25000 |
++--------+--------+---------+--------+--------+
+5 rows in set (0.00 sec)
+
+mysql> select * from employee right outer join account on employee.f_name=account.f_name ;
++--------+--------+---------+--------+--------+------+---------+--------+
+| f_name | l_name | desgn   | emp_id | salary | a_id | type    | f_name |
++--------+--------+---------+--------+--------+------+---------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |    1 | savings | rakesh |
+| rohit  | saxena | CTO     |      3 |  40000 |    4 | joint   | rohit  |
+| chetan | singh  | Manager |      2 |  60000 |    2 | savings | chetan |
+| chetu  | singh  | Damager |      4 |  10000 |    3 | joint   | chetu  |
+| NULL   | NULL   | NULL    |   NULL |   NULL |    6 | joint   | mohit  |
++--------+--------+---------+--------+--------+------+---------+--------+
+5 rows in set (0.00 sec)
+
+mysql> select * from employee left outer join account on employee.f_name=account.f_name ;
++--------+--------+---------+--------+--------+------+---------+--------+
+| f_name | l_name | desgn   | emp_id | salary | a_id | type    | f_name |
++--------+--------+---------+--------+--------+------+---------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |    1 | savings | rakesh |
+| chetan | singh  | Manager |      2 |  60000 |    2 | savings | chetan |
+| rohit  | saxena | CTO     |      3 |  40000 |    4 | joint   | rohit  |
+| chetu  | singh  | Damager |      4 |  10000 |    3 | joint   | chetu  |
+| dev    | lal    | clerk   |      6 |  25000 | NULL | NULL    | NULL   |
++--------+--------+---------+--------+--------+------+---------+--------+
+5 rows in set (0.00 sec)
+
+mysql> select * from employee full outer join account on employee.f_name=account.f_name ;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'outer join account on employee.f_name=account.f_name' at line 1
+mysql> select * from employee left outer join account on employee.f_name=account.f_name union all select * from account right outer join on employee.f_name=account.f_name;
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'on employee.f_name=account.f_name' at line 1
+mysql> select * from employee left outer join account on employee.f_name=account.f_name union all select * from account right outer join account on employee.f_name=account.f_name;
+ERROR 1066 (42000): Not unique table/alias: 'account'
+mysql> select * from employee left outer join account on employee.f_name=account.f_name union all select * from account right outer join employee  on employee.f_name=account.f_name;
++--------+---------+---------+--------+--------+---------+---------+--------+
+| f_name | l_name  | desgn   | emp_id | salary | a_id    | type    | f_name |
++--------+---------+---------+--------+--------+---------+---------+--------+
+| rakesh | kumar   | CEO     | 1      | 50000  | 1       | savings | rakesh |
+| chetan | singh   | Manager | 2      | 60000  | 2       | savings | chetan |
+| rohit  | saxena  | CTO     | 3      | 40000  | 4       | joint   | rohit  |
+| chetu  | singh   | Damager | 4      | 10000  | 3       | joint   | chetu  |
+| dev    | lal     | clerk   | 6      | 25000  | NULL    | NULL    | NULL   |
+| 1      | savings | rakesh  | rakesh | kumar  | CEO     | 1       | 50000  |
+| 2      | savings | chetan  | chetan | singh  | Manager | 2       | 60000  |
+| 4      | joint   | rohit   | rohit  | saxena | CTO     | 3       | 40000  |
+| 3      | joint   | chetu   | chetu  | singh  | Damager | 4       | 10000  |
+| NULL   | NULL    | NULL    | dev    | lal    | clerk   | 6       | 25000  |
++--------+---------+---------+--------+--------+---------+---------+--------+
+10 rows in set (0.00 sec)
+
+mysql> select * from employee;
++--------+--------+---------+--------+--------+
+| f_name | l_name | desgn   | emp_id | salary |
++--------+--------+---------+--------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |
+| rohit  | saxena | CTO     |      3 |  40000 |
+| chetan | singh  | Manager |      2 |  60000 |
+| chetu  | singh  | Damager |      4 |  10000 |
+| dev    | lal    | clerk   |      6 |  25000 |
++--------+--------+---------+--------+--------+
+5 rows in set (0.00 sec)
+
+mysql> select * from account;
++------+---------+--------+
+| a_id | type    | f_name |
++------+---------+--------+
+|    1 | savings | rakesh |
+|    2 | savings | chetan |
+|    4 | joint   | rohit  |
+|    3 | joint   | chetu  |
+|    6 | joint   | mohit  |
++------+---------+--------+
+5 rows in set (0.00 sec)
+
+mysql> select * from employee left outer join account on employee.f_name=account.f_name union all select * from employee right outer join acco
++--------+--------+---------+--------+--------+------+---------+--------+
+| f_name | l_name | desgn   | emp_id | salary | a_id | type    | f_name |
++--------+--------+---------+--------+--------+------+---------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |    1 | savings | rakesh |
+| chetan | singh  | Manager |      2 |  60000 |    2 | savings | chetan |
+| rohit  | saxena | CTO     |      3 |  40000 |    4 | joint   | rohit  |
+| chetu  | singh  | Damager |      4 |  10000 |    3 | joint   | chetu  |
+| dev    | lal    | clerk   |      6 |  25000 | NULL | NULL    | NULL   |
+| rakesh | kumar  | CEO     |      1 |  50000 |    1 | savings | rakesh |
+| rohit  | saxena | CTO     |      3 |  40000 |    4 | joint   | rohit  |
+| chetan | singh  | Manager |      2 |  60000 |    2 | savings | chetan |
+| chetu  | singh  | Damager |      4 |  10000 |    3 | joint   | chetu  |
+| NULL   | NULL   | NULL    |   NULL |   NULL |    6 | joint   | mohit  |
++--------+--------+---------+--------+--------+------+---------+--------+
+10 rows in set (0.00 sec)
+
+mysql> 
+
