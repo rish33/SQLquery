@@ -1,0 +1,176 @@
+use db;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+//select
+mysql> select * from employee;
++--------+--------+---------+--------+--------+
+| f_name | l_name | desgn   | emp_id | salary |
++--------+--------+---------+--------+--------+
+| rakesh | kumar  | CEO     |      1 |  50000 |
+| rohit  | saxena | CTO     |      3 |  40000 |
+| chetan | singh  | Manager |      2 |  60000 |
+| chetu  | singh  | Damager |      4 |  10000 |
+| dev    | lal    | clerk   |      6 |  25000 |
++--------+--------+---------+--------+--------+
+5 rows in set (0.00 sec)
+
+mysql> select * from account;
++------+---------+--------+
+| a_id | type    | f_name |
++------+---------+--------+
+|    1 | savings | rakesh |
+|    2 | savings | chetan |
+|    4 | joint   | rohit  |
+|    3 | joint   | chetu  |
+|    6 | joint   | mohit  |
++------+---------+--------+
+5 rows in set (0.00 sec)
+
+//sum
+mysql> select sum(salary) from employee;
++-------------+
+| sum(salary) |
++-------------+
+|      185000 |
++-------------+
+1 row in set (0.00 sec)
+
+//max
+mysql> select max(salary) from employee;
++-------------+
+| max(salary) |
++-------------+
+|       60000 |
++-------------+
+1 row in set (0.00 sec)
+
+//min
+mysql> select min(salary) from employee;
++-------------+
+| min(salary) |
++-------------+
+|       10000 |
++-------------+
+1 row in set (0.00 sec)
+
+//avg
+mysql> select avg(salary) from employee;
++-------------+
+| avg(salary) |
++-------------+
+|  37000.0000 |
++-------------+
+1 row in set (0.00 sec)
+
+//count
+mysql> select count(salary) from employee;
++---------------+
+| count(salary) |
++---------------+
+|             5 |
++---------------+
+1 row in set (0.00 sec)
+
+//case
+mysql> select case when emp_id<=2 then "yes" end from employee;
++------------------------------------+
+| case when emp_id<=2 then "yes" end |
++------------------------------------+
+| yes                                |
+| NULL                               |
+| yes                                |
+| NULL                               |
+| NULL                               |
++------------------------------------+
+5 rows in set (0.00 sec)
+
+// not in (EXCEPT)
+mysql> select * from employee where  f_name not in(select f_name from account);
++--------+--------+-------+--------+--------+
+| f_name | l_name | desgn | emp_id | salary |
++--------+--------+-------+--------+--------+
+| dev    | lal    | clerk |      6 |  25000 |
++--------+--------+-------+--------+--------+
+1 row in set (0.00 sec)
+
+//upper
+mysql> select upper(f_name) from employee where emp_id=1;
++---------------+
+| upper(f_name) |
++---------------+
+| RAKESH        |
++---------------+
+1 row in set (0.00 sec)
+
+//lower
+mysql> select lower(l_name) from employee where l_name="singh";
++---------------+
+| lower(l_name) |
++---------------+
+| singh         |
+| singh         |
++---------------+
+2 rows in set (0.00 sec)
+
+//increment
+mysql> update employee set salary=(salary*0.1 + salary);
+Query OK, 5 rows affected (0.05 sec)
+Rows matched: 5  Changed: 5  Warnings: 0
+
+mysql> select salary from employee;
++--------+
+| salary |
++--------+
+|  55000 |
+|  44000 |
+|  66000 |
+|  11000 |
+|  27500 |
++--------+
+5 rows in set (0.00 sec)
+
+
+//create trigger
+mysql> create trigger ins_sum before insert on account for each row set @sum= @sum +New.f_name;
+Query OK, 0 rows affected (0.09 sec)
+
+//create index
+mysql> create index idx on employee(l_name);
+Query OK, 0 rows affected (0.38 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+//delete index
+mysql> alter employee drop index idx;
+
+mysql> alter table  employee drop index idx;
+Query OK, 0 rows affected (0.19 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+//function
+mysql> DELIMITER //
+mysql> 
+mysql> CREATE FUNCTION CalcIncome ( starting_value INT )
+    -> RETURNS INT
+    -> 
+    -> BEGIN
+    -> 
+    ->    DECLARE income INT;
+    -> 
+    ->    SET income = 0;
+    -> 
+    ->    label1: WHILE income <= 3000 DO
+    ->      SET income = income + starting_value;
+    ->    END WHILE label1;
+    -> 
+    ->    RETURN income;
+    -> 
+    -> END; //
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> 
+mysql> DELIMITER ;SELECT CalcIncome (1000);
+
+
+
