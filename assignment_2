@@ -1,0 +1,158 @@
+create database assignment1;
+
+use assignment1;
+create table Employee
+(Id int ,
+Name varchar(50),
+Gender varchar(30),
+Basic long,
+HR long,
+DA long,
+TAX long,
+DeptId int,
+primary key(Id));
+
+
+Insert into Employee(Id,Name,Gender,Basic,HR,DA,TAX,DeptID) values
+(2,"Sanjana","Female",12000,6000,1000,500,2),
+(3,"Johnny","Male",5000,2500,500,200,3),
+(4,"Suresh","Male",6000,3000,500,250,1),
+(5,"Anglia","Female",11000,5500,1000,500,4),
+(6,"Saurabh","Male",12000,6000,1000,600,1),
+(7,"Manish","Male",4000,2000,500,150,2),
+(8,"Neeraj","Male",5000,2500,500,200,3),
+(9,"Suman","Female",5000,2500,500,200,4),
+(10,"Tina","Female",6000,3000,500,220,1);
+
+create table Department(DeptID int,DeptName varchar(40),DeptHeadID int);
+Insert into Department(DeptID,DeptName,DeptHeadID) values
+(1,"HR",1),
+(2,"Admin",2),
+(3,"Sales",9),
+(4,"Engineering",5);
+
+create table EmployeeAttendance(EmpID long, Date date,WorkingDays int, PresentDays int);
+Insert into EmployeeAttendance(EmpID,Date,WorkingDays,PresentDays) values
+(1,'2010-02-01',20,20),
+(1,'2010-03-01',22,20),
+(2,'2010-01-01',22,22),
+(2,'2010-02-01',20,20),
+(2,'2010-03-01',22,22),
+(3,'2010-01-01',22,21),
+(3,'2010-02-01',20,20),
+(3,'2010-03-01',22,21),
+(4,'2010-01-01',22,21),
+(4,'2010-02-01',20,19),
+(4,'2010-03-01',22,22),
+(5,'2010-01-01',22,23),
+(5,'2010-02-01',20,20),
+(5,'2010-03-01',22,22),
+(6,'2010-01-01',22,21),
+(6,'2010-02-01',20,20),
+(6,'2010-03-01',22,20),
+(7,'2010-01-01',22,21),
+(7,'2010-02-01',20,20),
+(7,'2010-03-01',22,21),
+(8,'2010-01-01',22,21),
+(8,'2010-02-01',20,20),
+(8,'2010-03-01',22,21),
+(9,'2010-01-01',22,22),
+(9,'2010-02-01',20,20),
+(9,'2010-03-01',22,21),
+(10,'2010-01-01',22,22),
+(10,'2010-02-01',20,20),
+(10,'2010-03-01',22,22)
+;
+use assignment1;
+/*query 1*/
+drop table Department;
+select DeptName ,Gender , count(Name)
+from Employee , Department
+where Employee.DeptId = Department.DeptID
+group by Gender,DeptName;
+
+
+
+Alter table Employee 
+add (Gross_Salary double);
+
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=1;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=2;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=3;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=4;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=5;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=6;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=7;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=8;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=9;
+Update Employee set Gross_Salary=Basic + HR + DA -TAX where Employee.Id=10;
+
+/*query 2*/
+select sum(Gross_Salary),count(Name),DeptName,max(Gross_Salary),Gender
+from Employee,Department
+where Employee.DeptId=Department.DeptID
+group by  DeptName,Gender;
+
+/*query 3*/
+select DeptName ,max(Gross_Salary) as Highest_Dept
+from Employee, Department
+where Employee.DeptId=Department.DeptID
+group by DeptName;
+
+/*query 4*/
+select Id ,Name from Employee 
+where Gross_Salary>15000;
+
+
+/*query 5*/
+select max(Basic) from Employee 
+where Basic not in(Select max(Basic) from Employee);
+
+/* query 6*/
+select DeptName, count(Name) 
+from Department left join Employee 
+on Department.DeptID= Employee.DeptId
+group by DeptName
+having count(Name)>3;
+
+/*query 7*/
+select DeptName,Name 
+from Employee, Department
+where Employee.Id=Department.DeptHeadID;
+
+/*query 8*/
+select Id,Name 
+from Employee left join EmployeeAttendance
+on Employee.Id=EmployeeAttendance.EmpID
+group by Id
+having sum(WorkingDays-PresentDays)=0;
+
+
+/*query 9*/
+select Name,Id  from
+(select e.Id,
+		   e.Name,
+           sum(WorkingDays-PresentDays) as Absents
+	from Employee e
+	left join EmployeeAttendance ea on e.Id=ea.EmpID
+	group by Id
+)BB
+inner join (
+select max(B.Absents) c
+from
+(
+	select e.Id,
+		   e.Name,
+           sum(WorkingDays-PresentDays) as Absents
+	from Employee e
+	left join EmployeeAttendance ea on e.Id=ea.EmpID
+	group by Id
+) B
+)AA;
+
+/*query 10*/
+select Id,Name 
+from Employee left join EmployeeAttendance
+on Employee.Id=EmployeeAttendance.EmpID
+group by Id
+having sum(WorkingDays-PresentDays)>2;
