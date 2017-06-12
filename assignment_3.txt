@@ -1,0 +1,251 @@
+
+/*question-1*/
+
+create database db;
+use db;
+/*product table*/
+create table t_product_master
+(Product_ID int, 
+Product_Name varchar(40),
+Cost_Per_Item long);
+
+insert into t_product_master
+values("P1","Pen",10);
+insert into t_product_master
+values("P2","Scale",15);
+insert into t_product_master
+values("P3","Notebook",25);
+
+/*user table*/
+create table t_user_master
+(User_ID varchar(30),
+User_Name varchar(30));
+
+insert into t_user_master
+values("U1","Alfred Lawrence");
+insert into t_user_master
+values("U2","William Paul");
+insert into t_user_master
+values("U3","Edward Fillip");
+
+/*transaction table*/
+create table t_transaction
+( 
+User_ID varchar(30),
+Product_ID varchar(30),
+Transaction_Date Date,
+Transaction_Type varchar(30),
+Transaction_Amount double);
+
+insert into t_transaction
+values("U1","P1",'2010-10-25',"Order",150);
+insert into t_transaction
+values("U1","P1",'2010-11-20',"Payment",750);
+insert into t_transaction
+values("U1","P1",'2010-11-20',"Order",200);
+insert into t_transaction
+values("U1","P3",'2010-11-25',"Order",50);
+insert into t_transaction
+values("U3","P2",'2010-11-26',"Order",100);
+insert into t_transaction
+values("U2","P1",'2010-12-15',"Order",75);
+insert into t_transaction
+values("U3","P2",'2011-01-15',"Payment",250);
+
+
+/*question*/
+create view view_1 
+as (select Y.User_ID,
+Y.Product_ID,
+Y.User_Name,
+Y.Transaction_Type,
+Y.Transaction_Date,
+Y.Qty,Y.Product_Name
+, case when Y.Transaction_Type="Order" then bal end as new_order
+,case when Y.Transaction_Type="Payment" then bal end as new_payment
+
+from
+(select X.Product_Name,
+X.User_ID,
+X.Product_ID, 
+X.Transaction_Type,
+X.Qty,
+X.Transaction_Date,
+X.User_Name,
+sum(X.Transaction_Amount) bal 
+ 
+ from
+(select T.User_ID,
+T.Product_ID,
+T.Transaction_Type, 
+T.Transaction_Amount,
+T.Transaction_Date, 
+(T.Transaction_Amount/P.Cost_Per_Item) as Qty, 
+P.Product_Name,P.Cost_Per_Item,
+U.User_Name 
+from t_transaction T
+inner join t_product_master P
+on P.Product_ID=T.Product_ID 
+inner join t_user_master U
+on T.User_ID=U.User_ID
+) X
+
+group by X.User_ID,X.Product_ID,X.Transaction_Type) Y);
+
+
+create view view_2 
+as (select User_ID,
+Product_ID, 
+User_Name,
+Transaction_Type,
+max(Transaction_Date) as Last_Transaction_Date,
+Qty,
+Product_Name,
+sum(new_order) as new_order,
+sum(new_payment) as new_payment
+from view_1
+group by User_Id,Product_ID)
+;
+
+
+
+create view view_3 
+as (select User_ID,
+Product_ID,
+User_Name,
+Transaction_Type,
+Last_Transaction_Date,
+Qty,
+Product_Name,
+coalesce(new_order,0) as new_order,
+coalesce(new_payment,0) as new_payment
+from view_2);
+
+
+
+
+
+Select User_Name,Product_Name,
+Qty,
+(new_payment) as Amount_Paid,
+Last_Transaction_Date,
+(new_payment - new_order) as Balance
+from view_3;
+
+
+
+
+
+/*question 3*/
+
+create database db1;
+use db1;
+create table  t_emp
+(Emp_id long,
+Emp_Code varchar(40), 
+Emp_f_name varchar(40),
+Emp_m_name varchar(40),
+Emp_l_name varchar(40),
+Emp_DOB date,Emp_DOJ date);
+
+insert into t_emp
+values(1001,"OPT20110105","Manmohan", null ,"Singh",'1983-02-10','2010-05-25');
+insert into t_emp
+values(1001,"OPT20100915","Alfred", "Joseph" ,"Lawerence",'1988-02-28',null);
+update  t_emp
+set Emp_id=1003 
+where Emp_f_name="Alfred";
+set SQL_SAFE_UPDATES=0;
+create table t_activity
+(Activity_id long ,
+Activity_description varchar(40));
+insert into t_activity
+values(1,"Code Analysis");
+insert into t_activity
+values(2,"Lunch");
+insert into t_activity
+values(3,"Coding");
+insert into t_activity
+values(4,"Knowledge Transition");
+insert into t_activity
+values(5,"Database");
+
+create table t_atten_det
+(Atten_id long,Emp_id long,Activity_id long,Attem_start_datetime datetime,Atten_end_hrs int);
+insert into t_atten_det
+values(1001,1001,5,'2011-02-13 10:00:00',2);
+insert into t_atten_det
+values(1002,1001,1,'2011-01-14 10:00:00',3);
+insert into t_atten_det
+values(1003,1001,3,'2011-01-14 10:00:00',5);
+insert into t_atten_det
+values(1004,1003,5,'2011-02-16 10:00:00',8);
+insert into t_atten_det
+values(1005,1003,5,'2011-02-17 10:00:00',8);
+insert into t_atten_det
+values(1006,1003,5,'2011-02-19 10:00:00',7);
+SET SQL_SAFE_UPDATES = 0;
+update  t_atten_det 
+set Attem_start_datetime = '2011-01-14 13:00:00' where Atten_end_hrs=5;
+
+create table t_salary
+(Salary_id long,Emp_id long,Changed_date date,New_Salary double);
+insert into t_salary 
+values(1001,1003,'2011-02-16',20000.00);
+insert into t_salary 
+values(1002,1003,'2011-01-05',25000.00);
+insert into t_salary 
+values(1003,1001,'2011-02-16',26000.00);
+
+use db1;
+
+
+/* question-4 a)*/
+select concat(Emp_f_name," ",Emp_m_name," ",Emp_l_name) Name ,
+ Emp_DOB 
+from t_emp 
+where day(date_add(Emp_DOB,interval 1 day))=1;
+
+
+
+/*question 4 b)*/
+(select Y.YEAR,Y.Month,Y.Day ,Y.name ,
+case when Y.Day='13' then Y.end_hrs end as '13',
+case when Y.Day='14' then Y.end_hrs end as '14',
+case when Y.Day='16' then Y.end_hrs end as '16',
+case when Y.Day='17' then Y.end_hrs end as '17',
+case when Y.Day='19' then Y.end_hrs end as '19'
+
+from
+
+(select  (year(X.Attem_start_datetime)) as YEAR,(monthname(X.Attem_start_datetime)) as Month ,day(X.Attem_start_datetime) as Day ,X.name,sum(X.Atten_end_hrs) end_hrs from
+(select A.Emp_id,Atten_end_hrs ,concat(coalesce(Emp_f_name,"")," ",coalesce(Emp_m_name,"")," ",coalesce(Emp_l_name,"")) as name,A.Attem_start_datetime
+ from
+t_atten_det as A
+inner join t_emp as E
+on A.Emp_id=E.Emp_id
+group by E.Emp_id,A.Attem_start_datetime)X
+group by YEAR, Month,Day,X.name)Y);
+
+
+
+use db1;
+drop procedure if exists fill;
+drop table if exists calendar;
+create table if not exists calendar(cal_date date not null primary key);
+
+delimiter $$
+create procedure fill(start_date date,end_date date)
+begin
+declare crt_date date;
+set crt_date=start_date;
+while crt_date<=end_date do
+insert into calendar values(crt_date);
+set crt_date=adddate(crt_date,Interval 1 day);
+end while;
+end$$
+delimiter ;
+
+call fill('2013-01-01','2013-01-03');
+
+select day(cal_date) as cal from calendar;
