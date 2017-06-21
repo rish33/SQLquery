@@ -1,0 +1,21 @@
+/*Section-B*/
+/*question-2b)*/
+use optimus;
+SET sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+
+
+select A.Dept_Name,A.Project_Name,hour(A.hours) as Time from
+(Select Dept.Dept_Name,A.Project_Name,time(A.Date_Time) as hours from
+((SELECT Project.Project_Name,Project.Project_ID,Time_Spent.Date_Time,Project.Dept_ID
+ FROM 
+Time_Spent
+inner join Engineer
+on Time_Spent.Eng_ID=Engineer.Eng_ID
+inner join Project
+on Project.Project_ID=Engineer.Project_ID)A
+inner join Dept
+on A.Dept_Id=Dept.Dept_ID))A
+group by A.Project_Name
+
+
+;
